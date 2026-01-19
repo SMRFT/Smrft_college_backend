@@ -22,6 +22,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,9 +76,7 @@ DATABASES = {
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
             'host': os.getenv("DB_HOST"),
-            'password': os.getenv("DB_PASSWORD"),
-            'tls': True,
-            'tlsCAFile': certifi.where(),
+
         }
     }
 }
