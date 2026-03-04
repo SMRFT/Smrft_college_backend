@@ -72,10 +72,10 @@ import certifi
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': os.getenv("DB_NAME"),
+        'NAME': "College",
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': os.getenv("DB_HOST"),
+            'host': os.getenv("GLOBAL_DB_HOST"),
 
         }
     }
@@ -116,3 +116,4 @@ CORS_ALLOWED_ORIGINS = [
 # File Upload Settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
+
