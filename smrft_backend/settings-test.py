@@ -18,7 +18,7 @@ SECRET_KEY = 'your-secret-key-here'  # Replace with your own secret key
 DEBUG = True
 
 # Allowed hosts (for production, add your domain)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["test.shinova.in"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -116,4 +116,5 @@ CORS_ALLOWED_ORIGINS = [
 # File Upload Settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
+
 
