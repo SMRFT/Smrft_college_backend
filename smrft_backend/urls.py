@@ -18,5 +18,6 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('smrft.url')),
+    path('_b_a_c_k_e_n_d/Smrft/', include('smrft.url')),
 ]
+
