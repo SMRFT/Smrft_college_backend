@@ -10,6 +10,8 @@ import gridfs
 from urllib.parse import quote_plus
 import json
 import logging
+import base64
+from io import BytesIO
 from .models import CourseEnquiry, AlumniRegistration
 from .serializers import CourseEnquirySerializer, AlumniRegistrationSerializer
 import os 
@@ -71,24 +73,34 @@ def get_events(request):
         return JsonResponse({'error': 'Failed to retrieve events'}, status=500)
 
 @api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser])
 def add_event(request):
     try:
         title = request.data.get('title')
         start_date = request.data.get('startDate')
         end_date = request.data.get('endDate')
         description = request.data.get('description', '')
-        image = request.FILES.get('image')
+        base64_image = request.data.get('image')  # Now expecting base64 string
+        filename = request.data.get('filename', 'upload.png')
 
-        if not title or not image:
+        if not title or not base64_image:
             return JsonResponse({'error': 'Title and Image are required'}, status=400)
+
+        # Handle Base64 decoding
+        if ',' in base64_image:
+            header, base64_image = base64_image.split(',', 1)
+            content_type = header.split(':')[1].split(';')[0]
+        else:
+            content_type = 'image/png'
+
+        image_data = base64.b64decode(base64_image)
+        image_file = BytesIO(image_data)
 
         db = get_db()
         fs = gridfs.GridFS(db)
         uploads_collection = db['uploads']
 
         # Save image to GridFS
-        file_id = fs.put(image, filename=image.name)
+        file_id = fs.put(image_file, filename=filename, contentType=content_type)
 
         # Save event metadata to uploads collection
         event_data = {
@@ -101,11 +113,11 @@ def add_event(request):
         
         result = uploads_collection.insert_one(event_data)
 
-        logger.info(f'Event added successfully: {result.inserted_id}')
+        logger.info(f'Event added successfully (Base64): {result.inserted_id}')
         return JsonResponse({'message': 'Event added successfully', 'id': str(result.inserted_id)}, status=201)
 
     except Exception as e:
-        logger.error(f'Error adding event: {str(e)}')
+        logger.error(f'Error adding event (Base64): {str(e)}')
         return JsonResponse({'error': f'Failed to add event: {str(e)}'}, status=500)
 
 @api_view(['DELETE'])
@@ -144,8 +156,9 @@ def get_file(request, file_id):
         file_data = fs.find_one({"_id": file_id_obj})
         
         if file_data:
-            response = HttpResponse(file_data.read(), content_type='image/png')
-            response['Content-Disposition'] = f'attachment; filename={file_data.filename}'
+            content_type = getattr(file_data, 'content_type', None) or file_data.get('contentType', 'image/png')
+            response = HttpResponse(file_data.read(), content_type=content_type)
+            response['Content-Disposition'] = f'inline; filename="{file_data.filename}"'
             return response
         else:
             return HttpResponse(status=404)

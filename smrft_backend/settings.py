@@ -112,3 +112,7 @@ STATIC_URL = '/static/'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # React development server
 ]
+
+# File Upload Settings
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
